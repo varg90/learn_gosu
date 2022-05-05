@@ -1,6 +1,6 @@
 require 'gosu'
 
-class EvacuationPlan < Gosu::Window
+class Game < Gosu::Window
   SCREEN_WIDTH = 800
   SCREEN_HEIGHT = 600
 
@@ -10,12 +10,21 @@ class EvacuationPlan < Gosu::Window
     fullscreen = false
   )
     super
-    self.caption = 'Evacuation plan'
+    self.caption = 'The MeowMeow Redemption'
     @image = Gosu::Image.from_text('AAA!', 100)
+    @background_music = Gosu::Song.new('./sounds/purring.mp3')
+    @background_music.play
   end
 
   def button_down(id)
     close if id == Gosu::KbEscape
+    if id == Gosu::KbM
+      if @background_music.paused?
+        @background_music.play
+      else
+        @background_music.pause
+      end
+    end
   end
 
   def update
@@ -29,4 +38,4 @@ class EvacuationPlan < Gosu::Window
   end
 end
 
-EvacuationPlan.new.show
+Game.new.show

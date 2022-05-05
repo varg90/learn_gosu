@@ -10,10 +10,7 @@ class Game < Gosu::Window
     fullscreen = false
   )
     super
-    self.caption = 'The MeowMeow Redemption'
-    @image = Gosu::Image.from_text('AAA!', 100)
-    @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
-    @background_music.play
+    prepare_scene
   end
 
   def button_down(id)
@@ -29,16 +26,33 @@ class Game < Gosu::Window
   end
 
   def update
-    @x = SCREEN_WIDTH / 2 - @image.width / 2 + Math.sin(5 * Time.now.to_f) * 150
-    @y =
-      SCREEN_HEIGHT / 2 - @image.height / 2 - Math.cos(5 * Time.now.to_f) * 150
+    @x -= 5 if self.button_down?(Gosu::KbLeft)
+    @x += 5 if self.button_down?(Gosu::KbRight)
+    @y -= 5 if self.button_down?(Gosu::KbUp)
+    @y += 5 if self.button_down?(Gosu::KbDown)
   end
 
   def draw
-    @image.draw @x, @y, 0, 1, 1, 0xff_fffffa
+    @player.draw @x, @y, 1
   end
 
   private
+
+  def prepare_scene
+    self.caption = 'The MeowMeow Redemption'
+
+    @player = Gosu::Image.new(image_file('sample'))
+
+    @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
+    @background_music.play
+
+    @x = SCREEN_WIDTH / 2 - @player.width / 2
+    @y = SCREEN_HEIGHT / 2 - @player.height / 2
+  end
+
+  def image_file(filename, format: 'png')
+    "./images/#{filename}.#{format}"
+  end
 
   def sound_file(filename, format: 'wav')
     "./sounds/#{filename}.#{format}"

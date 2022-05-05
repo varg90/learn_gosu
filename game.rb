@@ -27,18 +27,18 @@ class Game < Gosu::Window
 
   def update
     if self.button_down?(Gosu::KbLeft)
-      if @x_direction == 1
+      if @x_direction == :right
         @x -= 5
       else
-        @x_direction = 1
+        @x_direction = :right
         @x -= @player.width
       end
     end
     if self.button_down?(Gosu::KbRight)
-      if @x_direction == -1
+      if @x_direction == :left
         @x += 5
       else
-        @x_direction = -1
+        @x_direction = :left
         @x += @player.width
       end
     end
@@ -47,7 +47,7 @@ class Game < Gosu::Window
   end
 
   def draw
-    @player.draw @x, @y, 1, @x_direction
+    @player.draw @x, @y, 1, x_scale_by_direction
   end
 
   private
@@ -60,7 +60,7 @@ class Game < Gosu::Window
     @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
     @background_music.play
 
-    @x_direction = 1
+    @x_direction = :right
     @x = SCREEN_WIDTH / 2 - @player.width / 2
     @y = SCREEN_HEIGHT / 2 - @player.height / 2
   end
@@ -71,6 +71,10 @@ class Game < Gosu::Window
 
   def sound_file(filename, format: 'wav')
     "./sounds/#{filename}.#{format}"
+  end
+
+  def x_scale_by_direction
+    @x_direction == :right ? 1 : -1
   end
 end
 

@@ -12,7 +12,7 @@ class Game < Gosu::Window
     super
     self.caption = 'The MeowMeow Redemption'
     @image = Gosu::Image.from_text('AAA!', 100)
-    @background_music = Gosu::Song.new('./sounds/purring.mp3')
+    @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
     @background_music.play
   end
 
@@ -25,6 +25,7 @@ class Game < Gosu::Window
         @background_music.pause
       end
     end
+    Gosu::Sample.new(sound_file("meow_#{rand(1..8)}")).play if id == Gosu::KbE
   end
 
   def update
@@ -35,6 +36,12 @@ class Game < Gosu::Window
 
   def draw
     @image.draw @x, @y, 0, 1, 1, 0xff_fffffa
+  end
+
+  private
+
+  def sound_file(filename, format: 'wav')
+    "./sounds/#{filename}.#{format}"
   end
 end
 

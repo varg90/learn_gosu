@@ -1,4 +1,5 @@
 require 'gosu'
+require_relative 'player'
 
 class Game < Gosu::Window
   SCREEN_WIDTH = 800
@@ -22,32 +23,32 @@ class Game < Gosu::Window
         @background_music.pause
       end
     end
-    Gosu::Sample.new(sound_file("meow_#{rand(1..8)}")).play if id == Gosu::KbE
+    meow if id == Gosu::KbE
+  end
+
+  def button_up(id)
+    if [Gosu::KbLeft, Gosu::GpLeft, Gosu::KbRight, Gosu::GpRight].include?(id)
+      @player.stop_move
+    end
   end
 
   def update
-    if self.button_down?(Gosu::KbLeft)
-      if @x_direction == :right
-        @x -= 5
-      else
-        @x_direction = :right
-        @x -= @player.width
-      end
+    if self.button_down?(Gosu::KbLeft) || self.button_down?(Gosu::GpLeft)
+      @player.move(:left)
     end
-    if self.button_down?(Gosu::KbRight)
-      if @x_direction == :left
-        @x += 5
-      else
-        @x_direction = :left
-        @x += @player.width
-      end
+    if self.button_down?(Gosu::KbRight) || self.button_down?(Gosu::GpRight)
+      @player.move(:right)
     end
-    @y -= 5 if self.button_down?(Gosu::KbUp)
-    @y += 5 if self.button_down?(Gosu::KbDown)
+    if self.button_down?(Gosu::KbUp) || self.button_down?(Gosu::GpUp)
+      @player.move(:up)
+    end
+    if self.button_down?(Gosu::KbDown) || self.button_down?(Gosu::GpDown)
+      @player.move(:down)
+    end
   end
 
   def draw
-    @player.draw @x, @y, 1, x_scale_by_direction
+    @player.draw
   end
 
   private
@@ -55,14 +56,10 @@ class Game < Gosu::Window
   def prepare_scene
     self.caption = 'The MeowMeow Redemption'
 
-    @player = Gosu::Image.new(image_file('sample'))
+    @player = Player.new(400, 300)
 
     @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
     @background_music.play
-
-    @x_direction = :right
-    @x = SCREEN_WIDTH / 2 - @player.width / 2
-    @y = SCREEN_HEIGHT / 2 - @player.height / 2
   end
 
   def image_file(filename, format: 'png')
@@ -73,8 +70,8 @@ class Game < Gosu::Window
     "./sounds/#{filename}.#{format}"
   end
 
-  def x_scale_by_direction
-    @x_direction == :right ? 1 : -1
+  def meow
+    Gosu::Sample.new(sound_file("meow_#{rand(1..8)}")).play
   end
 end
 

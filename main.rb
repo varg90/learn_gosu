@@ -12,39 +12,32 @@ class Game < Gosu::Window
   )
     super
     prepare_scene
+    set_controls
   end
 
   def button_down(id)
-    close if id == Gosu::KbEscape
-    if id == Gosu::KbM
+    close if id == @keys[:exit]
+    if id == @keys[:mute]
       if @background_music.paused?
         @background_music.play
       else
         @background_music.pause
       end
     end
-    meow if id == Gosu::KbE
+    meow if id == @keys[:interact]
   end
 
   def button_up(id)
-    if [Gosu::KbLeft, Gosu::GpLeft, Gosu::KbRight, Gosu::GpRight].include?(id)
+    if @keys.values_at(:left, :right, :up, :down).flatten.include?(id)
       @player.stop_move
     end
   end
 
   def update
-    if self.button_down?(Gosu::KbLeft) || self.button_down?(Gosu::GpLeft)
-      @player.move(:left)
-    end
-    if self.button_down?(Gosu::KbRight) || self.button_down?(Gosu::GpRight)
-      @player.move(:right)
-    end
-    if self.button_down?(Gosu::KbUp) || self.button_down?(Gosu::GpUp)
-      @player.move(:up)
-    end
-    if self.button_down?(Gosu::KbDown) || self.button_down?(Gosu::GpDown)
-      @player.move(:down)
-    end
+    @player.move(:left) if pressed?(:left)
+    @player.move(:right) if pressed?(:right)
+    @player.move(:up) if pressed?(:up)
+    @player.move(:down) if pressed?(:down)
   end
 
   def draw
@@ -60,6 +53,27 @@ class Game < Gosu::Window
 
     @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
     @background_music.play
+  end
+
+  def set_controls
+    @keys = {
+      left: [Gosu::KbLeft, Gosu::KbA],
+      right: [Gosu::KbRight, Gosu::KbD],
+      up: [Gosu::KbUp, Gosu::KbW],
+      down: [Gosu::KbDown, Gosu::KbS],
+      exit: Gosu::KbEscape,
+      mute: Gosu::KbM,
+      interact: Gosu::KbE
+    }
+  end
+
+  def pressed?(button)
+    gosu_keys = @keys[button]
+    if gosu_keys.is_a?(Array)
+      gosu_keys.select { |key| button_down?(key) }.any?
+    else
+      button_down?(gosu_keys)
+    end
   end
 
   def image_file(filename, format: 'png')

@@ -11,11 +11,11 @@ class Player
 
   def initialize(x, y)
     @run_frames =
-      Gosu::Image.load_tiles image_file('knight/move'),
+      Gosu::Image.load_tiles image_path('knight/move'),
                              PLAYER_WIDTH,
                              PLAYER_HEIGHT
     @attack_frames =
-      Gosu::Image.load_tiles image_file('knight/attack'),
+      Gosu::Image.load_tiles image_path('knight/attack'),
                              66,
                              PLAYER_HEIGHT
     @x, @y = x, y
@@ -78,7 +78,7 @@ class Player
 
   def meow
     return if @meowing
-    Gosu::Sample.new(sound_file("meow_#{rand(1..8)}")).play
+    Gosu::Sample.new(sound_path("meow_#{rand(1..8)}")).play
     @meowing = true
   end
 end

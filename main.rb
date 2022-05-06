@@ -1,6 +1,7 @@
 require 'gosu'
 require_relative 'lib/player'
 require_relative 'lib/helpers'
+require_relative 'lib/explosion'
 
 class Game < Gosu::Window
   include Helpers
@@ -27,15 +28,17 @@ class Game < Gosu::Window
         @background_music.pause
       end
     end
+
+    if id == Gosu::MsLeft
+      @explosions << Explosion.new(@explode_animation, mouse_x, mouse_y)
+    end
   end
 
   def button_up(id)
     if @keys.values_at(:left, :right, :up, :down).flatten.include?(id)
       @player.stop_move
     end
-    if id == @keys[:interact]
-      @player.stop_attack
-    end
+    @player.stop_attack if id == @keys[:interact]
   end
 
   def update
@@ -43,13 +46,20 @@ class Game < Gosu::Window
     @player.move(:right) if pressed?(:right)
     @player.move(:up) if pressed?(:up)
     @player.move(:down) if pressed?(:down)
-    if pressed?(:interact)
-      @player.attack
-    end
+    @player.attack if pressed?(:interact)
+
+    @explosions.reject!(&:done?)
+    @explosions.map(&:update)
   end
 
   def draw
+    @background.draw(0, 0, 0)
     @player.draw
+    @explosions.map(&:draw)
+  end
+
+  def needs_cursor?
+    true
   end
 
   private
@@ -57,10 +67,16 @@ class Game < Gosu::Window
   def prepare_scene
     self.caption = 'The MeowMeow Redemption'
 
+    @background = Gosu::Image.new(image_path('background', format: 'jpg'))
+
     @player = Player.new(400, 300)
 
-    @background_music = Gosu::Song.new(sound_file('purring', format: 'mp3'))
+    @background_music = Gosu::Song.new(sound_path('purring', format: 'mp3'))
     @background_music.play
+
+    @explode_animation =
+      Gosu::Image.load_tiles(image_path('explosion'), 128, 128)
+    @explosions = []
   end
 
   def set_controls

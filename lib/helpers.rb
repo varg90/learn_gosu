@@ -1,11 +1,11 @@
 require 'gosu'
 
 module Helpers
-  def image_file(filename, format: 'png')
+  def image_path(filename, format: 'png')
     File.join(File.dirname(__FILE__), "../media/images/#{filename}.#{format}")
   end
 
-  def sound_file(filename, format: 'wav')
+  def sound_path(filename, format: 'wav')
     File.join(File.dirname(__FILE__), "../media/sounds/#{filename}.#{format}")
   end
 

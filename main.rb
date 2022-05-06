@@ -1,7 +1,10 @@
 require 'gosu'
-require_relative 'player'
+require_relative 'lib/player'
+require_relative 'lib/helpers'
 
 class Game < Gosu::Window
+  include Helpers
+
   SCREEN_WIDTH = 800
   SCREEN_HEIGHT = 600
 
@@ -24,12 +27,14 @@ class Game < Gosu::Window
         @background_music.pause
       end
     end
-    meow if id == @keys[:interact]
   end
 
   def button_up(id)
     if @keys.values_at(:left, :right, :up, :down).flatten.include?(id)
       @player.stop_move
+    end
+    if id == @keys[:interact]
+      @player.stop_attack
     end
   end
 
@@ -38,6 +43,9 @@ class Game < Gosu::Window
     @player.move(:right) if pressed?(:right)
     @player.move(:up) if pressed?(:up)
     @player.move(:down) if pressed?(:down)
+    if pressed?(:interact)
+      @player.attack
+    end
   end
 
   def draw
@@ -65,27 +73,6 @@ class Game < Gosu::Window
       mute: Gosu::KbM,
       interact: Gosu::KbE
     }
-  end
-
-  def pressed?(button)
-    gosu_keys = @keys[button]
-    if gosu_keys.is_a?(Array)
-      gosu_keys.select { |key| button_down?(key) }.any?
-    else
-      button_down?(gosu_keys)
-    end
-  end
-
-  def image_file(filename, format: 'png')
-    "./images/#{filename}.#{format}"
-  end
-
-  def sound_file(filename, format: 'wav')
-    "./sounds/#{filename}.#{format}"
-  end
-
-  def meow
-    Gosu::Sample.new(sound_file("meow_#{rand(1..8)}")).play
   end
 end
 
